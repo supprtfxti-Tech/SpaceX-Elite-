@@ -98,7 +98,7 @@ router.post('/purchase', (req: any, res) => {
     const tx = db.transaction(() => {
       if (price > 0) {
         // Check wallet balance
-        const wallet = db.prepare('SELECT * FROM wallets WHERE user_id = ? AND currency = ?').get(req.user.userId, 'USD') as any;
+        const wallet = db.prepare('SELECT * FROM wallets WHERE user_id = ? AND type = ? AND currency = ?').get(req.user.userId, 'main', 'USD') as any;
         
         if (!wallet || wallet.balance < price) {
           throw new Error('Insufficient USD balance to purchase this bot');

@@ -80,7 +80,23 @@ export default function TradingBot() {
       const res = await fetch('/api/bot', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error('Failed to fetch bot configuration');
+      
+      if (!res.ok) {
+        let errorMessage = 'Failed to fetch bot configuration';
+        try {
+          const errData = await res.json();
+          errorMessage = errData.error || errorMessage;
+        } catch (e) {
+          // Ignore JSON parse error
+        }
+        throw new Error(errorMessage);
+      }
+      
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned an invalid response');
+      }
+      
       const data = await res.json();
       setBot(data);
       setStrategy(data.strategy);
@@ -112,8 +128,19 @@ export default function TradingBot() {
       });
       
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to toggle bot');
+        let errorMessage = 'Failed to toggle bot';
+        try {
+          const errData = await res.json();
+          errorMessage = errData.error || errorMessage;
+        } catch (e) {
+          // Ignore JSON parse error
+        }
+        throw new Error(errorMessage);
+      }
+      
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned an invalid response');
       }
       
       const updatedBot = await res.json();
@@ -147,8 +174,19 @@ export default function TradingBot() {
       });
       
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to update configuration');
+        let errorMessage = 'Failed to update configuration';
+        try {
+          const errData = await res.json();
+          errorMessage = errData.error || errorMessage;
+        } catch (e) {
+          // Ignore JSON parse error
+        }
+        throw new Error(errorMessage);
+      }
+      
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned an invalid response');
       }
       
       const updatedBot = await res.json();
@@ -179,8 +217,19 @@ export default function TradingBot() {
       });
       
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to purchase bot');
+        let errorMessage = 'Failed to purchase bot';
+        try {
+          const errData = await res.json();
+          errorMessage = errData.error || errorMessage;
+        } catch (e) {
+          // Ignore JSON parse error
+        }
+        throw new Error(errorMessage);
+      }
+      
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Server returned an invalid response');
       }
       
       const updatedBot = await res.json();

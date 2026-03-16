@@ -30,6 +30,11 @@ async function startServer() {
   app.use("/api/admin", adminRoutes);
   app.use("/api/bot", botRoutes);
 
+  // Catch-all for unhandled API routes
+  app.all("/api/*", (req, res) => {
+    res.status(404).json({ error: "API route not found" });
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
