@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import DashboardLayout from '../components/DashboardLayout';
 import TransferModal from '../components/TransferModal';
@@ -50,6 +51,7 @@ const marqueeItems = [
 
 export default function Dashboard() {
   const { user, token } = useAuthStore();
+  const navigate = useNavigate();
   const [wallets, setWallets] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -244,16 +246,16 @@ export default function Dashboard() {
                 <span className="text-sm font-bold text-silver-200 uppercase tracking-wider">Withdraw</span>
               </button>
               <button 
-                onClick={() => setModalType('transfer')}
+                onClick={() => navigate('/dashboard/bots')}
                 className="flex flex-col items-center justify-center gap-4 p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] hover:border-white/20 transition-all duration-300 group shadow-inner"
               >
                 <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(168,85,247,0.1)] group-hover:shadow-[0_0_20px_rgba(168,85,247,0.2)]">
-                  <ArrowRightLeft className="w-6 h-6 text-purple-500" />
+                  <Cpu className="w-6 h-6 text-purple-500" />
                 </div>
-                <span className="text-sm font-bold text-silver-200 uppercase tracking-wider">Transfer</span>
+                <span className="text-sm font-bold text-silver-200 uppercase tracking-wider">Bots</span>
               </button>
               <button 
-                onClick={() => window.location.href = '/dashboard/markets'}
+                onClick={() => navigate('/dashboard/markets')}
                 className="flex flex-col items-center justify-center gap-4 p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] hover:border-white/20 transition-all duration-300 group shadow-inner"
               >
                 <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(245,158,11,0.1)] group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)]">
@@ -283,7 +285,7 @@ export default function Dashboard() {
             <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-6">
               <h3 className="text-xl font-bold text-white tracking-tight">Your Wallets</h3>
               <button 
-                onClick={() => window.location.href = '/dashboard/wallets'}
+                onClick={() => navigate('/dashboard/wallets')}
                 className="text-xs text-accent-500 hover:text-accent-400 font-bold uppercase tracking-wider transition-colors"
               >
                 View All

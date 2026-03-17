@@ -7,6 +7,7 @@ import {
   LineChart, Users, HelpCircle, AlertTriangle, FileText,
   Menu, X, TrendingDown, Home, Cpu
 } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -35,6 +36,8 @@ const marqueeItems = [
 
 export default function Landing() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isAuthenticated, user } = useAuthStore();
+  const dashboardPath = user?.role === 'admin' || user?.role === 'super_admin' ? '/admin' : '/dashboard';
 
   return (
     <div className="min-h-screen flex flex-col bg-graphite-900 overflow-x-hidden font-sans text-silver-100 selection:bg-accent-500/30">
@@ -65,12 +68,20 @@ export default function Landing() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <Link to="/login" className="text-sm font-medium text-silver-300 hover:text-white transition-colors hidden sm:block">
-              Client Login
-            </Link>
-            <Link to="/register" className="px-5 py-2.5 bg-white text-graphite-900 hover:bg-silver-200 text-sm font-semibold rounded-lg transition-colors shadow-lg shadow-white/10 hidden sm:block">
-              Open Account
-            </Link>
+            {isAuthenticated ? (
+              <Link to={dashboardPath} className="px-5 py-2.5 bg-white text-graphite-900 hover:bg-silver-200 text-sm font-semibold rounded-lg transition-colors shadow-lg shadow-white/10 hidden sm:block">
+                Go to Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" className="text-sm font-medium text-silver-300 hover:text-white transition-colors hidden sm:block">
+                  Client Login
+                </Link>
+                <Link to="/register" className="px-5 py-2.5 bg-white text-graphite-900 hover:bg-silver-200 text-sm font-semibold rounded-lg transition-colors shadow-lg shadow-white/10 hidden sm:block">
+                  Open Account
+                </Link>
+              </>
+            )}
             
             {/* Mobile Menu Toggle */}
             <button 
@@ -98,8 +109,14 @@ export default function Landing() {
                 <a href="#security" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-medium text-silver-300 hover:text-white transition-colors">Security</a>
                 <a href="#faq" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-medium text-silver-300 hover:text-white transition-colors">FAQ</a>
                 <div className="h-px bg-white/10 my-2"></div>
-                <Link to="/login" className="text-sm font-medium text-silver-300 hover:text-white transition-colors">Client Login</Link>
-                <Link to="/register" className="text-center px-5 py-2.5 bg-white text-graphite-900 hover:bg-silver-200 text-sm font-semibold rounded-lg transition-colors">Open Account</Link>
+                {isAuthenticated ? (
+                  <Link to={dashboardPath} className="text-center px-5 py-2.5 bg-white text-graphite-900 hover:bg-silver-200 text-sm font-semibold rounded-lg transition-colors">Go to Dashboard</Link>
+                ) : (
+                  <>
+                    <Link to="/login" className="text-sm font-medium text-silver-300 hover:text-white transition-colors">Client Login</Link>
+                    <Link to="/register" className="text-center px-5 py-2.5 bg-white text-graphite-900 hover:bg-silver-200 text-sm font-semibold rounded-lg transition-colors">Open Account</Link>
+                  </>
+                )}
               </div>
             </motion.div>
           )}
@@ -138,9 +155,15 @@ export default function Landing() {
               </p>
               
               <div className="flex flex-col sm:flex-row items-center gap-4">
-                <Link to="/register" className="w-full sm:w-auto px-8 py-4 bg-white hover:bg-silver-200 text-graphite-900 font-semibold rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] flex items-center justify-center gap-2 group">
-                  Access Platform <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
+                {isAuthenticated ? (
+                  <Link to={dashboardPath} className="w-full sm:w-auto px-8 py-4 bg-white hover:bg-silver-200 text-graphite-900 font-semibold rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] flex items-center justify-center gap-2 group">
+                    Go to Dashboard <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                ) : (
+                  <Link to="/register" className="w-full sm:w-auto px-8 py-4 bg-white hover:bg-silver-200 text-graphite-900 font-semibold rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] flex items-center justify-center gap-2 group">
+                    Access Platform <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                )}
                 <a href="#how-it-works" className="w-full sm:w-auto px-8 py-4 bg-transparent border border-white/20 hover:bg-white/5 font-medium text-white rounded-xl transition-colors flex items-center justify-center">
                   How it Works
                 </a>

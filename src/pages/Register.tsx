@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { User, Mail, Lock, Globe, ArrowRight, Loader2, ShieldCheck, ArrowLeft } from 'lucide-react';
@@ -24,8 +24,14 @@ export default function Register() {
     resolver: zodResolver(registerSchema)
   });
 
-  const login = useAuthStore((state) => state.login);
+  const { login, isAuthenticated, user } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      navigate(user.role === 'admin' || user.role === 'super_admin' ? '/admin' : '/dashboard');
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const onSubmit = async (data: RegisterForm) => {
     setError('');

@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { motion } from 'motion/react';
-import { Settings, Shield, Bell, Database, Save } from 'lucide-react';
+import { Settings, Shield, Bell, Database, Save, Loader2, CheckCircle2 } from 'lucide-react';
+import { useAuthStore } from '../../store/authStore';
 
 export default function AdminSettings() {
+  const { token } = useAuthStore();
+  const [maintenanceLoading, setMaintenanceLoading] = useState(false);
+  const [maintenanceSuccess, setMaintenanceSuccess] = useState(false);
+
+  const runMaintenance = async () => {
+    setMaintenanceLoading(true);
+    setMaintenanceSuccess(false);
+    try {
+      const res = await fetch('/api/admin/maintenance', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        setMaintenanceSuccess(true);
+        setTimeout(() => setMaintenanceSuccess(false), 3000);
+      }
+    } catch (error) {
+      console.error('Maintenance failed:', error);
+    } finally {
+      setMaintenanceLoading(false);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="max-w-4xl mx-auto space-y-8">
@@ -80,6 +106,44 @@ export default function AdminSettings() {
                   <input type="checkbox" className="sr-only peer" defaultChecked />
                   <div className="w-11 h-6 bg-graphite-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent-500"></div>
                 </label>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* System Maintenance */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="glass-panel p-6 rounded-2xl"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                <Database className="w-5 h-5 text-blue-400" />
+              </div>
+              <h2 className="text-lg font-bold text-white">System Maintenance</h2>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-graphite-900/50 border border-white/10 rounded-xl">
+                <div>
+                  <h3 className="text-white font-medium">Database Optimization</h3>
+                  <p className="text-sm text-silver-400">Clean up expired sessions and optimize database storage</p>
+                </div>
+                <button 
+                  onClick={runMaintenance}
+                  disabled={maintenanceLoading}
+                  className="flex items-center gap-2 px-4 py-2 bg-graphite-800 hover:bg-graphite-700 text-white rounded-lg font-medium transition-colors border border-white/10 disabled:opacity-50"
+                >
+                  {maintenanceLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : maintenanceSuccess ? (
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  ) : (
+                    <Database className="w-4 h-4" />
+                  )}
+                  {maintenanceLoading ? 'Running...' : maintenanceSuccess ? 'Completed' : 'Run Maintenance'}
+                </button>
               </div>
             </div>
           </motion.div>

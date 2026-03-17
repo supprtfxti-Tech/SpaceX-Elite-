@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
+import { useEffect, useState } from 'react';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -17,6 +18,7 @@ import AdminSettings from './pages/admin/Settings';
 import TradingBot from './pages/TradingBot';
 import RealEstate from './pages/RealEstate';
 import { ReactNode } from 'react';
+import { Loader2 } from 'lucide-react';
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -24,6 +26,43 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 };
 
 export default function App() {
+  const { token, user, setUser, logout } = useAuthStore();
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      if (token && !user) {
+        try {
+          const res = await fetch('/api/auth/me', {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          if (res.ok) {
+            const userData = await res.json();
+            setUser(userData);
+          } else {
+            logout();
+          }
+        } catch (error) {
+          console.error('Failed to fetch user profile:', error);
+          logout();
+        }
+      }
+      setIsInitializing(false);
+    };
+
+    initAuth();
+  }, [token, user, setUser, logout]);
+
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-graphite-900">
+        <Loader2 className="w-8 h-8 text-accent-500 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <BrowserRouter>
       <Routes>

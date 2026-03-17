@@ -112,7 +112,7 @@ router.post('/purchase', (req: any, res) => {
         db.prepare(`
           INSERT INTO transactions (id, user_id, wallet_id, type, amount, currency, status, description)
           VALUES (?, ?, ?, 'investment', ?, 'USD', 'completed', ?)
-        `).run(txId, req.user.userId, wallet.id, price, `Purchased ${bot_type} trading bot`);
+        `).run(txId, req.user.userId, wallet.id, -price, `Purchased ${bot_type} trading bot`);
       }
       
       // Update bot

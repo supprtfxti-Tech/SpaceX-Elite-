@@ -7,6 +7,11 @@ const dbPath = path.join(__dirname, '../../database.sqlite');
 
 const db = new Database(dbPath);
 
+// Enable WAL mode for better concurrency and performance
+db.pragma('journal_mode = WAL');
+db.pragma('synchronous = NORMAL');
+db.pragma('foreign_keys = ON');
+
 // Initialize database schema
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (

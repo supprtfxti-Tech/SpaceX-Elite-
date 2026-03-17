@@ -134,6 +134,25 @@ const authenticate = (req: any, res: any, next: any) => {
   }
 };
 
+router.get('/me', authenticate, (req: any, res) => {
+  try {
+    const user = db.prepare('SELECT id, email, full_name, role, kyc_status FROM users WHERE id = ?').get(req.user.userId) as any;
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({
+      id: user.id,
+      email: user.email,
+      fullName: user.full_name,
+      role: user.role,
+      kycStatus: user.kyc_status
+    });
+  } catch (error) {
+    console.error('Get profile error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 router.get('/sessions', authenticate, (req: any, res) => {
   try {
     const sessions = db.prepare('SELECT id, device_info, ip_address, created_at, expires_at FROM sessions WHERE user_id = ? ORDER BY created_at DESC').all(req.user.userId);

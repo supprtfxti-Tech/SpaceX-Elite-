@@ -74,7 +74,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             );
           })}
 
-          {user?.role === 'super_admin' && (
+          {(user?.role === 'super_admin' || user?.role === 'admin') && (
             <div className="pt-4 mt-4 border-t border-white/10">
               <Link
                 to="/dashboard"
@@ -195,7 +195,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   );
                 })}
 
-                {user?.role === 'super_admin' && (
+                {(user?.role === 'super_admin' || user?.role === 'admin') && (
                   <div className="pt-4 mt-4 border-t border-white/10">
                     <Link
                       to="/dashboard"

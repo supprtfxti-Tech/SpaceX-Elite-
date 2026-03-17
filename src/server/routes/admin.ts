@@ -17,6 +17,24 @@ const requireAdmin = (req: any, res: any, next: any) => {
 
 router.use(requireAdmin);
 
+// Run system maintenance
+router.post('/maintenance', (req: any, res) => {
+  try {
+    // Clean up expired sessions
+    db.prepare('DELETE FROM sessions WHERE expires_at < CURRENT_TIMESTAMP').run();
+    
+    // Optimize database
+    db.pragma('optimize');
+    db.exec('VACUUM');
+    db.exec('ANALYZE');
+    
+    res.json({ success: true, message: 'System maintenance completed successfully' });
+  } catch (error) {
+    console.error('Maintenance error:', error);
+    res.status(500).json({ error: 'Failed to run maintenance' });
+  }
+});
+
 // Get all users
 router.get('/users', (req: any, res) => {
   try {
@@ -138,6 +156,7 @@ router.post('/users/:id/balance', (req: any, res) => {
       db.prepare('UPDATE wallets SET balance = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(newBalance, wallet.id);
       
       const txId = crypto.randomUUID();
+      const txAmount = type === 'add' ? amount : -amount;
       db.prepare(`
         INSERT INTO transactions (id, user_id, wallet_id, type, amount, status, description)
         VALUES (?, ?, ?, ?, ?, 'completed', ?)
@@ -146,7 +165,7 @@ router.post('/users/:id/balance', (req: any, res) => {
         id, 
         wallet.id, 
         type === 'add' ? 'deposit' : 'withdrawal', 
-        amount, 
+        txAmount, 
         `Admin balance adjustment (${type})`
       );
     });
@@ -177,6 +196,8 @@ router.delete('/users/:id', (req: any, res) => {
       db.prepare('DELETE FROM wallets WHERE user_id = ?').run(id);
       db.prepare('DELETE FROM sessions WHERE user_id = ?').run(id);
       db.prepare('DELETE FROM trading_bots WHERE user_id = ?').run(id);
+      db.prepare('DELETE FROM investments WHERE user_id = ?').run(id);
+      db.prepare('DELETE FROM real_estate_investments WHERE user_id = ?').run(id);
       db.prepare('DELETE FROM users WHERE id = ?').run(id);
     });
 

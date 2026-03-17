@@ -41,12 +41,26 @@ router.get('/', (req: any, res) => {
 router.post('/', (req: any, res) => {
   try {
     const userId = req.user.userId;
-    const { walletId, type, amount, currency, status, details, description } = req.body;
+    const { walletId, type, currency, status, details, description } = req.body;
+    let { amount } = req.body;
     const desc = description || details || null;
     const dbType = type === 'withdraw' ? 'withdrawal' : type;
 
-    if (!walletId || !type || !amount || !currency) {
+    if (!walletId || !type || amount === undefined || !currency) {
       return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Ensure amount is a number
+    amount = Number(amount);
+    if (isNaN(amount) || amount === 0) {
+      return res.status(400).json({ error: 'Invalid amount' });
+    }
+
+    // Enforce correct sign based on transaction type
+    if (type === 'withdraw') {
+      amount = -Math.abs(amount);
+    } else if (type === 'deposit') {
+      amount = Math.abs(amount);
     }
 
     // Begin transaction

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { Lock, Mail, ArrowRight, Loader2, ArrowLeft } from 'lucide-react';
@@ -9,7 +9,8 @@ import { motion } from 'motion/react';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required')
+  password: z.string().min(1, 'Password is required'),
+  rememberMe: z.boolean().optional()
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -18,12 +19,29 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema)
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      rememberMe: false
+    }
   });
   
-  const login = useAuthStore((state) => state.login);
+  const { login, isAuthenticated, user } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      navigate(user.role === 'admin' || user.role === 'super_admin' ? '/admin' : '/dashboard');
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('spacex_remembered_email');
+    if (savedEmail) {
+      setValue('email', savedEmail);
+      setValue('rememberMe', true);
+    }
+  }, [setValue]);
 
   const onSubmit = async (data: LoginForm) => {
     setError('');
@@ -33,7 +51,7 @@ export default function Login() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ email: data.email, password: data.password }),
       });
 
       const resData = await res.json();
@@ -42,8 +60,14 @@ export default function Login() {
         throw new Error(resData.error || 'Login failed');
       }
 
+      if (data.rememberMe) {
+        localStorage.setItem('spacex_remembered_email', data.email);
+      } else {
+        localStorage.removeItem('spacex_remembered_email');
+      }
+
       login(resData.user, resData.token);
-      if (resData.user.role === 'admin') {
+      if (resData.user.role === 'admin' || resData.user.role === 'super_admin') {
         navigate('/admin');
       } else {
         navigate('/dashboard');
@@ -130,6 +154,18 @@ export default function Login() {
               />
             </div>
             {errors.password && <p className="text-red-400 text-xs mt-1.5">{errors.password.message}</p>}
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              {...register('rememberMe')}
+              className="w-4 h-4 rounded border-white/10 bg-graphite-900/50 text-accent-500 focus:ring-accent-500 focus:ring-offset-graphite-900"
+            />
+            <label htmlFor="rememberMe" className="ml-2 text-sm text-silver-400">
+              Remember my email
+            </label>
           </div>
 
           <button
