@@ -54,7 +54,7 @@ export default function Login() {
         body: JSON.stringify({ email: data.email, password: data.password }),
       });
 
-      const resData = await res.json();
+      const resData = await res.text().then(text => text ? JSON.parse(text) : {});
 
       if (!res.ok) {
         throw new Error(resData.error || 'Login failed');

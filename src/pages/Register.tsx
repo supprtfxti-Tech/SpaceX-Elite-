@@ -44,7 +44,7 @@ export default function Register() {
         body: JSON.stringify(data),
       });
 
-      const resData = await res.json();
+      const resData = await res.text().then(text => text ? JSON.parse(text) : {});
 
       if (!res.ok) {
         throw new Error(resData.error || 'Registration failed');

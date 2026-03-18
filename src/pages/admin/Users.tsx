@@ -31,7 +31,7 @@ export default function AdminUsers() {
     try {
       const usersRes = await fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` } });
       if (!usersRes.ok) throw new Error('Failed to fetch admin data');
-      const usersData = await usersRes.json();
+      const usersData = await usersRes.text().then(text => text ? JSON.parse(text) : {});
       setUsers(usersData);
     } catch (err: any) {
       setError(err.message);
@@ -85,7 +85,7 @@ export default function AdminUsers() {
         body: method !== 'DELETE' ? JSON.stringify(body) : undefined
       });
 
-      const data = await res.json();
+      const data = await res.text().then(text => text ? JSON.parse(text) : {});
 
       if (!res.ok) throw new Error(data.error || 'Action failed');
 

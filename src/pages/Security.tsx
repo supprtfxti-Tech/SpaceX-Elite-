@@ -29,7 +29,7 @@ export default function Security() {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.ok) {
-          const data = await res.json();
+          const data = await res.text().then(text => text ? JSON.parse(text) : {});
           setSessions(data);
         }
       } catch (err) {

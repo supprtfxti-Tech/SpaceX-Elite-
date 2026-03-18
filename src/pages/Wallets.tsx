@@ -33,7 +33,7 @@ export default function Wallets() {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
-        const data = await res.json();
+        const data = await res.text().then(text => text ? JSON.parse(text) : {});
         setWallets(data);
       }
     } catch (err) {
@@ -50,7 +50,7 @@ export default function Wallets() {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
-        const data = await res.json();
+        const data = await res.text().then(text => text ? JSON.parse(text) : {});
         setTransactions(data.transactions || []);
       }
     } catch (err) {
