@@ -84,7 +84,7 @@ export default function TradingBot() {
       if (!res.ok) {
         let errorMessage = 'Failed to fetch bot configuration';
         try {
-          const errData = await res.json();
+          const errData = await res.text().then(text => text ? JSON.parse(text) : {});
           errorMessage = errData.error || errorMessage;
         } catch (e) {
           // Ignore JSON parse error
@@ -97,7 +97,7 @@ export default function TradingBot() {
         throw new Error('Server returned an invalid response');
       }
       
-      const data = await res.json();
+      const data = await res.text().then(text => text ? JSON.parse(text) : {});
       setBot(data);
       setStrategy(data.strategy);
       setPair(data.pair);
@@ -130,7 +130,7 @@ export default function TradingBot() {
       if (!res.ok) {
         let errorMessage = 'Failed to toggle bot';
         try {
-          const errData = await res.json();
+          const errData = await res.text().then(text => text ? JSON.parse(text) : {});
           errorMessage = errData.error || errorMessage;
         } catch (e) {
           // Ignore JSON parse error
@@ -143,7 +143,7 @@ export default function TradingBot() {
         throw new Error('Server returned an invalid response');
       }
       
-      const updatedBot = await res.json();
+      const updatedBot = await res.text().then(text => text ? JSON.parse(text) : {});
       setBot(updatedBot);
       setSuccess(`Bot successfully ${newStatus === 'active' ? 'started' : 'stopped'}`);
     } catch (err: any) {
@@ -176,7 +176,7 @@ export default function TradingBot() {
       if (!res.ok) {
         let errorMessage = 'Failed to update configuration';
         try {
-          const errData = await res.json();
+          const errData = await res.text().then(text => text ? JSON.parse(text) : {});
           errorMessage = errData.error || errorMessage;
         } catch (e) {
           // Ignore JSON parse error
@@ -189,7 +189,7 @@ export default function TradingBot() {
         throw new Error('Server returned an invalid response');
       }
       
-      const updatedBot = await res.json();
+      const updatedBot = await res.text().then(text => text ? JSON.parse(text) : {});
       setBot(updatedBot);
       setSuccess('Configuration saved successfully');
     } catch (err: any) {
@@ -219,7 +219,7 @@ export default function TradingBot() {
       if (!res.ok) {
         let errorMessage = 'Failed to purchase bot';
         try {
-          const errData = await res.json();
+          const errData = await res.text().then(text => text ? JSON.parse(text) : {});
           errorMessage = errData.error || errorMessage;
         } catch (e) {
           // Ignore JSON parse error
@@ -232,7 +232,7 @@ export default function TradingBot() {
         throw new Error('Server returned an invalid response');
       }
       
-      const updatedBot = await res.json();
+      const updatedBot = await res.text().then(text => text ? JSON.parse(text) : {});
       setBot(updatedBot);
       setSuccess(`Successfully upgraded to ${BOT_TYPES.find(b => b.id === botType)?.name}`);
     } catch (err: any) {

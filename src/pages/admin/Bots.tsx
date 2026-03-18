@@ -37,7 +37,7 @@ export default function AdminBots() {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to fetch trading bots');
-      const data = await res.json();
+      const data = await res.text().then(text => text ? JSON.parse(text) : {});
       setBots(data);
     } catch (err: any) {
       setError(err.message);
@@ -79,7 +79,7 @@ export default function AdminBots() {
         body: method !== 'DELETE' ? JSON.stringify(body) : undefined
       });
 
-      const data = await res.json();
+      const data = await res.text().then(text => text ? JSON.parse(text) : {});
       if (!res.ok) throw new Error(data.error || 'Action failed');
 
       setSuccessMsg(`Successfully updated trading bot.`);

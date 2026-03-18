@@ -37,7 +37,7 @@ export default function AdminInvestments() {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to fetch investments');
-      const data = await res.json();
+      const data = await res.text().then(text => text ? JSON.parse(text) : {});
       setInvestments(data);
     } catch (err: any) {
       setError(err.message);
@@ -79,7 +79,7 @@ export default function AdminInvestments() {
         body: method !== 'DELETE' ? JSON.stringify(body) : undefined
       });
 
-      const data = await res.json();
+      const data = await res.text().then(text => text ? JSON.parse(text) : {});
       if (!res.ok) throw new Error(data.error || 'Action failed');
 
       setSuccessMsg(`Successfully updated investment.`);

@@ -40,7 +40,7 @@ export default function Admin() {
 
       if (!statsRes.ok) throw new Error('Failed to fetch admin data');
 
-      const statsData = await statsRes.json();
+      const statsData = await statsRes.text().then(text => text ? JSON.parse(text) : {});
       setStats(statsData);
     } catch (err: any) {
       setError(err.message);

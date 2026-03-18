@@ -47,7 +47,7 @@ export default function AdminRealEstate() {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to fetch properties');
-      const data = await res.json();
+      const data = await res.text().then(text => text ? JSON.parse(text) : {});
       setProperties(data);
     } catch (err: any) {
       setError(err.message);
@@ -122,7 +122,7 @@ export default function AdminRealEstate() {
         body: body ? JSON.stringify(body) : undefined
       });
 
-      const data = await res.json();
+      const data = await res.text().then(text => text ? JSON.parse(text) : {});
       if (!res.ok) throw new Error(data.error || 'Action failed');
 
       setSuccessMsg(`Successfully ${actionType === 'create' ? 'created' : actionType === 'edit' ? 'updated' : 'deleted'} property.`);

@@ -39,7 +39,7 @@ export default function App() {
             }
           });
           if (res.ok) {
-            const userData = await res.json();
+            const userData = await res.text().then(text => text ? JSON.parse(text) : {});
             setUser(userData);
           } else {
             logout();

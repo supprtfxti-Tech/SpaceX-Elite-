@@ -85,7 +85,7 @@ export default function TransferModal({ isOpen, onClose, type, wallets, onSucces
       });
 
       if (!res.ok) {
-        const data = await res.json();
+        const data = await res.text().then(text => text ? JSON.parse(text) : {});
         throw new Error(data.error || 'Transaction failed');
       }
 

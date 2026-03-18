@@ -29,7 +29,7 @@ export default function Transactions() {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to fetch transactions');
-      const data = await res.json();
+      const data = await res.text().then(text => text ? JSON.parse(text) : {});
       setTransactions(data.transactions);
     } catch (err: any) {
       setError(err.message);
